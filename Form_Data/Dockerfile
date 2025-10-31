@@ -1,24 +1,23 @@
-# Step 1: Build the app
-FROM node:18 AS build
+# Step 1: Use a modern Node image
+FROM node:20-alpine AS build
 
 WORKDIR /app
 
-# Copy package files and install dependencies
+# Copy dependency files and install
 COPY package*.json ./
 RUN npm install
 
-# Copy all files and build the project
+# Copy all project files and build React app
 COPY . .
 RUN npm run build
 
-# Step 2: Serve the app using Nginx
+# Step 2: Use Nginx to serve static files
 FROM nginx:alpine
 
-# Copy the React build output to nginx's html folder
+# Copy the build output to Nginx HTML folder
 COPY --from=build /app/build /usr/share/nginx/html
 
-# Expose port 80
 EXPOSE 80
 
-# Start nginx
+# Start Nginx
 CMD ["nginx", "-g", "daemon off;"]
