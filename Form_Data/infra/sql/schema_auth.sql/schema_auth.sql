@@ -1,0 +1,36 @@
+-- infra/sql/schema_auth.sql
+USE Customerdata;
+GO
+
+CREATE TABLE dbo.Users (
+  Id INT IDENTITY(1,1) PRIMARY KEY,
+  Username NVARCHAR(100) NOT NULL UNIQUE,
+  PasswordHash NVARCHAR(200) NOT NULL,
+  IsAdmin BIT NOT NULL DEFAULT 0,
+  CreatedAt DATETIME2 DEFAULT SYSUTCDATETIME()
+);
+
+CREATE TABLE dbo.LoginHistory (
+  Id INT IDENTITY(1,1) PRIMARY KEY,
+  UserId INT NULL,
+  Username NVARCHAR(100) NULL,
+  Success BIT,
+  IpAddress NVARCHAR(100) NULL,
+  UserAgent NVARCHAR(500) NULL,
+  CreatedAt DATETIME2 DEFAULT SYSUTCDATETIME()
+);
+
+CREATE TABLE dbo.Customers (
+  Id INT IDENTITY(1,1) PRIMARY KEY,
+  Name NVARCHAR(200) NOT NULL,
+  DOB DATE NULL,
+  Phone NVARCHAR(50) NULL,
+  Address NVARCHAR(500) NULL,
+  CreatedAt DATETIME2 DEFAULT SYSUTCDATETIME()
+);
+
+IF NOT EXISTS (SELECT 1 FROM dbo.Users WHERE Username = 'admin')
+BEGIN
+  INSERT INTO dbo.Users (Username, PasswordHash, IsAdmin)
+  VALUES ('admin', '$2b$12$0Heh.G9irPMah2stxsSz8eOWxkoQbq7rJRcSq1FKTIsCxve6KuBO.', 1);
+END
